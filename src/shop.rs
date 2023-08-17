@@ -1,5 +1,6 @@
 use crate::food_queue::FoodQueue;
 
+#[derive(Debug, Clone)]
 pub struct Shop {
     queues: Vec<FoodQueue>,
     stock: usize,

@@ -1,5 +1,6 @@
 use crate::customer::Customer;
 
+#[derive(Debug, Clone)]
 pub struct FoodQueue {
     id: usize,
     queue: Vec<Customer>,
@@ -25,5 +26,17 @@ impl FoodQueue {
 
     pub fn view_data(&self) -> &[Customer] {
         self.queue.as_slice()
+    }
+
+    pub fn is_full(&self) -> bool {
+        self.queue.len() >= self.capacity
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.queue.is_empty()
+    }
+
+    pub fn len(&self) -> usize {
+        self.queue.len()
     }
 }

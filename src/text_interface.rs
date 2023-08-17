@@ -51,7 +51,7 @@ impl TextInterface {
                 .trim()
             {
                 "VFQ" => self.vfq(),
-                "VEQ" => todo!(),
+                "VEQ" => self.veq(),
                 "ACQ" => todo!(),
                 "RCQ" => todo!(),
                 "PCQ" => todo!(),
@@ -131,5 +131,24 @@ impl TextInterface {
 
         Self::display_header(title);
         self.display_queues(title, self.shop.view_data());
+    }
+
+    fn veq(&self) {
+        let title = "View Empty Queues";
+        let queues = self
+            .shop
+            .view_data()
+            .iter()
+            .map(|queue| {
+                if queue.is_full() {
+                    FoodQueue::new(999, 0)
+                } else {
+                    queue.to_owned()
+                }
+            })
+            .collect::<Vec<_>>();
+
+        Self::display_header(title);
+        self.display_queues(title, queues.as_slice());
     }
 }
