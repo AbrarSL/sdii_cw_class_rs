@@ -105,6 +105,8 @@ impl TextInterface {
     }
 
     fn display_queues(&self, title: &str, queues: &[FoodQueue]) {
+        Self::display_header(title);
+
         let queue_char_padding =
             " ".repeat(((title.len() + DECOR_PADDING - queues.len()) / queues.len()) / 2);
 
@@ -127,14 +129,10 @@ impl TextInterface {
     }
 
     fn vfq(&self) {
-        let title = "View All Queues";
-
-        Self::display_header(title);
-        self.display_queues(title, self.shop.view_data());
+        self.display_queues("View All The Queues", self.shop.view_data());
     }
 
     fn veq(&self) {
-        let title = "View Empty Queues";
         let queues = self
             .shop
             .view_data()
@@ -148,7 +146,6 @@ impl TextInterface {
             })
             .collect::<Vec<_>>();
 
-        Self::display_header(title);
-        self.display_queues(title, queues.as_slice());
+        self.display_queues("View Empty Queues", queues.as_slice());
     }
 }
