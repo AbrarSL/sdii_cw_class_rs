@@ -7,6 +7,12 @@ pub struct FoodQueue {
     capacity: usize,
 }
 
+#[derive(Debug)]
+pub enum FoodQueueError {
+    Full,
+    Empty,
+}
+
 impl FoodQueue {
     pub fn new(id: usize, capacity: usize) -> Self {
         Self {
@@ -38,5 +44,14 @@ impl FoodQueue {
 
     pub fn len(&self) -> usize {
         self.queue.len()
+    }
+
+    pub fn add_customer(&mut self, customer: Customer) -> Result<&Customer, FoodQueueError> {
+        if self.is_full() {
+            return Err(FoodQueueError::Full);
+        }
+
+        self.queue.push(customer);
+        Ok(self.queue.last().unwrap())
     }
 }

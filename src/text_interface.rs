@@ -3,7 +3,11 @@ use std::{
     io::{stdin, stdout, Write},
 };
 
-use crate::{food_queue::FoodQueue, shop::Shop};
+use crate::{
+    customer::Customer,
+    food_queue::FoodQueue,
+    shop::{self, Shop, ShopError},
+};
 
 const DECOR_CHARACTER: &'static str = "*";
 const DECOR_PADDING: usize = 10;
@@ -52,7 +56,7 @@ impl TextInterface {
             {
                 "VFQ" => self.vfq(),
                 "VEQ" => self.veq(),
-                "ACQ" => todo!(),
+                "ACQ" => self.acq(),
                 "RCQ" => todo!(),
                 "PCQ" => todo!(),
                 "VCS" => todo!(),
@@ -147,5 +151,41 @@ impl TextInterface {
             .collect::<Vec<_>>();
 
         self.display_queues("View Empty Queues", queues.as_slice());
+    }
+
+    fn acq(&mut self) {
+        let first_name = Self::string_input_prompt("Enter first name: ").unwrap();
+        let last_name = Self::string_input_prompt("Enter last name: ").unwrap();
+        let no_items = match Self::int_input_prompt(
+            "Enter number of items: ",
+            1,
+            shop::STOCK_MAX_THRESHOLD as isize,
+        ) {
+            Ok(value) => value,
+            Err(error) => match error {
+                InputError::IOError => panic!(),
+                InputError::InputTypeError => {
+                    println!("Incorrect input type! Please enter a number!");
+                    return;
+                }
+                InputError::InputRangeError => {
+                    println!(
+                        "Input is out of range! Input must be between 1 and {}.",
+                        shop::STOCK_MAX_THRESHOLD
+                    );
+                    return;
+                }
+            },
+        };
+
+        let customer = Customer::new(first_name, last_name, no_items as usize);
+
+        match self.shop.add_customer(customer) {
+            Ok(_) => println!("Successfully added to queue."),
+            Err(error) => match error {
+                ShopError::Full => println!("All queues are full!"),
+                ShopError::QueueError(_) => panic!(),
+            },
+        };
     }
 }
