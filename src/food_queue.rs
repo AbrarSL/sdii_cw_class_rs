@@ -54,4 +54,12 @@ impl FoodQueue {
         self.queue.push(customer);
         Ok(self.queue.last().unwrap())
     }
+
+    pub fn remove_customer(&mut self, customer_pos: usize) -> Result<Customer, FoodQueueError> {
+        if self.is_empty() {
+            return Err(FoodQueueError::Empty);
+        }
+
+        Ok(self.queue.remove(customer_pos))
+    }
 }

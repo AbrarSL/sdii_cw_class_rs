@@ -57,7 +57,7 @@ impl TextInterface {
                 "VFQ" => self.vfq(),
                 "VEQ" => self.veq(),
                 "ACQ" => self.acq(),
-                "RCQ" => todo!(),
+                "RCQ" => self.rcq(),
                 "PCQ" => todo!(),
                 "VCS" => todo!(),
                 "SPD" => todo!(),
@@ -145,6 +145,7 @@ impl TextInterface {
     fn handle_shop_error(error: ShopError) {
         match error {
             ShopError::Full => println!("All queues are full!"),
+            ShopError::QueueNotFound => println!("Queue not found!"),
             ShopError::QueueError(queue_error) => match queue_error {
                 FoodQueueError::Full => println!("Queue is full!"),
                 FoodQueueError::Empty => println!("Queue is empty!"),
@@ -194,5 +195,33 @@ impl TextInterface {
             Ok(_) => println!("Successfully added to queue."),
             Err(error) => Self::handle_shop_error(error),
         };
+    }
+
+    fn rcq(&mut self) {
+        let queue_no =
+            match Self::int_input_prompt("Enter the queue number: ", 0, self.shop.len() as isize) {
+                Ok(value) => value as usize,
+                Err(error) => {
+                    Self::handle_input_error(error);
+                    return;
+                }
+            };
+
+        let customer_pos = match Self::int_input_prompt(
+            "Enter the customer position: ",
+            0,
+            self.shop.view_data()[queue_no].len() as isize,
+        ) {
+            Ok(value) => value as usize,
+            Err(error) => {
+                Self::handle_input_error(error);
+                return;
+            }
+        };
+
+        match self.shop.remove_customer(queue_no, customer_pos) {
+            Ok(customer) => println!("Successfully removed customer {}", customer.first_name()),
+            Err(error) => Self::handle_shop_error(error),
+        }
     }
 }

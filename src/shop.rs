@@ -17,6 +17,7 @@ pub struct Shop {
 #[derive(Debug)]
 pub enum ShopError {
     Full,
+    QueueNotFound,
     QueueError(FoodQueueError),
 }
 
@@ -33,6 +34,10 @@ impl Shop {
 
     pub fn stock(&self) -> usize {
         self.stock
+    }
+
+    pub fn len(&self) -> usize {
+        self.queues.len()
     }
 
     pub fn view_data(&self) -> &[FoodQueue] {
@@ -56,5 +61,17 @@ impl Shop {
             Some(queue) => Ok(queue.add_customer(customer).unwrap()),
             None => Err(ShopError::Full),
         }
+    }
+
+    pub fn remove_customer(
+        &mut self,
+        queue_no: usize,
+        customer_pos: usize,
+    ) -> Result<Customer, ShopError> {
+        self.queues
+            .get_mut(queue_no)
+            .ok_or_else(|| ShopError::QueueNotFound)?
+            .remove_customer(customer_pos)
+            .or_else(|error| Err(ShopError::QueueError(error)))
     }
 }
