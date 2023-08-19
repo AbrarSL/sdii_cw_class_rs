@@ -5,7 +5,7 @@ use std::{
 
 use crate::{
     customer::Customer,
-    food_queue::FoodQueue,
+    food_queue::{FoodQueue, FoodQueueError},
     shop::{self, Shop, ShopError},
 };
 
@@ -21,7 +21,7 @@ pub struct TextInterface {
 pub enum InputError {
     IOError,
     InputTypeError,
-    InputRangeError,
+    InputRangeError(isize, isize),
 }
 
 impl TextInterface {
@@ -92,7 +92,7 @@ impl TextInterface {
             .or_else(|_| Err(InputError::InputTypeError))?;
 
         if number < start || number > end {
-            Err(InputError::InputRangeError)
+            Err(InputError::InputRangeError(start, end))
         } else {
             Ok(number)
         }
@@ -132,6 +132,26 @@ impl TextInterface {
         stdout().flush().unwrap();
     }
 
+    fn handle_input_error(error: InputError) {
+        match error {
+            InputError::IOError => println!("An unrecoverable system error has occured!"),
+            InputError::InputRangeError(start, end) => {
+                println!("Input is out of range! Input must be between {start} and {end}")
+            }
+            InputError::InputTypeError => println!("Input must be a valid number!"),
+        }
+    }
+
+    fn handle_shop_error(error: ShopError) {
+        match error {
+            ShopError::Full => println!("All queues are full!"),
+            ShopError::QueueError(queue_error) => match queue_error {
+                FoodQueueError::Full => println!("Queue is full!"),
+                FoodQueueError::Empty => println!("Queue is empty!"),
+            },
+        }
+    }
+
     fn vfq(&self) {
         self.display_queues("View All The Queues", self.shop.view_data());
     }
@@ -162,30 +182,17 @@ impl TextInterface {
             shop::STOCK_MAX_THRESHOLD as isize,
         ) {
             Ok(value) => value,
-            Err(error) => match error {
-                InputError::IOError => panic!(),
-                InputError::InputTypeError => {
-                    println!("Incorrect input type! Please enter a number!");
-                    return;
-                }
-                InputError::InputRangeError => {
-                    println!(
-                        "Input is out of range! Input must be between 1 and {}.",
-                        shop::STOCK_MAX_THRESHOLD
-                    );
-                    return;
-                }
-            },
+            Err(error) => {
+                Self::handle_input_error(error);
+                return;
+            }
         };
 
         let customer = Customer::new(first_name, last_name, no_items as usize);
 
         match self.shop.add_customer(customer) {
             Ok(_) => println!("Successfully added to queue."),
-            Err(error) => match error {
-                ShopError::Full => println!("All queues are full!"),
-                ShopError::QueueError(_) => panic!(),
-            },
+            Err(error) => Self::handle_shop_error(error),
         };
     }
 }
