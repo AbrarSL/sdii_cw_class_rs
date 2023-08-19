@@ -11,6 +11,7 @@ pub struct FoodQueue {
 pub enum FoodQueueError {
     Full,
     Empty,
+    CustomerNotFound,
 }
 
 impl FoodQueue {
@@ -61,5 +62,12 @@ impl FoodQueue {
         }
 
         Ok(self.queue.remove(customer_pos))
+    }
+
+    pub fn get_customer(&self, customer_pos: usize) -> Result<&Customer, FoodQueueError> {
+        Ok(self
+            .queue
+            .get(customer_pos)
+            .ok_or_else(|| FoodQueueError::CustomerNotFound))?
     }
 }

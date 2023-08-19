@@ -58,7 +58,7 @@ impl TextInterface {
                 "VEQ" => self.veq(),
                 "ACQ" => self.acq(),
                 "RCQ" => self.rcq(),
-                "PCQ" => todo!(),
+                "PCQ" => self.pcq(),
                 "VCS" => todo!(),
                 "SPD" => todo!(),
                 "LPD" => todo!(),
@@ -146,9 +146,11 @@ impl TextInterface {
         match error {
             ShopError::Full => println!("All queues are full!"),
             ShopError::QueueNotFound => println!("Queue not found!"),
+            ShopError::StockInsufficient => println!("Stock is insufficient to conduct operation!"),
             ShopError::QueueError(queue_error) => match queue_error {
                 FoodQueueError::Full => println!("Queue is full!"),
                 FoodQueueError::Empty => println!("Queue is empty!"),
+                FoodQueueError::CustomerNotFound => println!("Customer not found!"),
             },
         }
     }
@@ -221,6 +223,26 @@ impl TextInterface {
 
         match self.shop.remove_customer(queue_no, customer_pos) {
             Ok(customer) => println!("Successfully removed customer {}", customer.first_name()),
+            Err(error) => Self::handle_shop_error(error),
+        }
+    }
+
+    fn pcq(&mut self) {
+        let queue_no =
+            match Self::int_input_prompt("Enter the queue number: ", 0, self.shop.len() as isize) {
+                Ok(value) => value as usize,
+                Err(error) => {
+                    Self::handle_input_error(error);
+                    return;
+                }
+            };
+
+        match self.shop.serve_customer(queue_no) {
+            Ok(customer) => println!(
+                "Customer {} was served {} items!",
+                customer.first_name(),
+                customer.no_items()
+            ),
             Err(error) => Self::handle_shop_error(error),
         }
     }

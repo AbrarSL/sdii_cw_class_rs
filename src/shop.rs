@@ -7,6 +7,7 @@ use crate::{
 
 pub const STOCK_LOW_THRESHOLD: usize = 10;
 pub const STOCK_MAX_THRESHOLD: usize = 50;
+pub const ITEM_PRICE: usize = 500;
 
 #[derive(Debug, Clone)]
 pub struct Shop {
@@ -18,6 +19,7 @@ pub struct Shop {
 pub enum ShopError {
     Full,
     QueueNotFound,
+    StockInsufficient,
     QueueError(FoodQueueError),
 }
 
@@ -34,6 +36,10 @@ impl Shop {
 
     pub fn stock(&self) -> usize {
         self.stock
+    }
+
+    fn set_stock(&mut self, stock: usize) {
+        self.stock = stock;
     }
 
     pub fn len(&self) -> usize {
@@ -73,5 +79,23 @@ impl Shop {
             .ok_or_else(|| ShopError::QueueNotFound)?
             .remove_customer(customer_pos)
             .or_else(|error| Err(ShopError::QueueError(error)))
+    }
+
+    pub fn serve_customer(&mut self, queue_no: usize) -> Result<Customer, ShopError> {
+        let (new_stock, overflow) = self.stock().overflowing_sub(
+            self.queues
+                .get(queue_no)
+                .ok_or_else(|| ShopError::QueueNotFound)?
+                .get_customer(0)
+                .or_else(|error| Err(ShopError::QueueError(error)))?
+                .no_items(),
+        );
+
+        if overflow {
+            return Err(ShopError::StockInsufficient);
+        }
+        self.set_stock(new_stock);
+
+        Ok(self.remove_customer(queue_no, 0).unwrap())
     }
 }
