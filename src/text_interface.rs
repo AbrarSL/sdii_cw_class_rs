@@ -59,7 +59,7 @@ impl TextInterface {
                 "ACQ" => self.acq(),
                 "RCQ" => self.rcq(),
                 "PCQ" => self.pcq(),
-                "VCS" => todo!(),
+                "VCS" => self.vcs(),
                 "SPD" => todo!(),
                 "LPD" => todo!(),
                 "STK" => todo!(),
@@ -244,6 +244,19 @@ impl TextInterface {
                 customer.no_items()
             ),
             Err(error) => Self::handle_shop_error(error),
+        }
+    }
+
+    fn vcs(&self) {
+        Self::display_header("Sorted Customers List");
+
+        let sorted_customers = self.shop.get_sorted_customers();
+        for customer in sorted_customers {
+            println!(
+                "Name: {}\nItems: {}",
+                customer.full_name(),
+                customer.no_items()
+            );
         }
     }
 }

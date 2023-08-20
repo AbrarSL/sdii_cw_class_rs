@@ -98,4 +98,16 @@ impl Shop {
 
         Ok(self.remove_customer(queue_no, 0).unwrap())
     }
+
+    pub fn get_sorted_customers(&self) -> Vec<&Customer> {
+        let mut sorted_list = self
+            .queues
+            .iter()
+            .map(|queue| queue.view_data().iter())
+            .flatten()
+            .collect::<Vec<&Customer>>();
+        sorted_list.sort();
+
+        sorted_list
+    }
 }
