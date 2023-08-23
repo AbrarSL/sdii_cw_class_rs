@@ -1,5 +1,6 @@
 use std::{
     cmp::Ordering,
+    fs::File,
     io::{stdin, stdout, Write},
 };
 
@@ -11,6 +12,7 @@ use crate::{
 
 const DECOR_CHARACTER: &'static str = "*";
 const DECOR_PADDING: usize = 10;
+const DEFAULT_SAVE_PATH: &'static str = "./program_state.txt";
 
 pub struct TextInterface {
     shop: Shop,
@@ -60,8 +62,8 @@ impl TextInterface {
                 "RCQ" => self.rcq(),
                 "PCQ" => self.pcq(),
                 "VCS" => self.vcs(),
-                "SPD" => todo!(),
-                "LPD" => todo!(),
+                "SPD" => self.spd(),
+                "LPD" => self.lpd(),
                 "STK" => todo!(),
                 "AFS" => todo!(),
                 "EXT" => break,
@@ -258,5 +260,23 @@ impl TextInterface {
                 customer.no_items()
             );
         }
+    }
+
+    fn spd(&self) {
+        Self::display_header("Save Program Data");
+
+        let mut save_file = File::create(DEFAULT_SAVE_PATH).unwrap();
+        self.shop.save_to_file(&mut save_file).unwrap();
+
+        println!("Successfully saved data to {DEFAULT_SAVE_PATH}");
+    }
+
+    fn lpd(&mut self) {
+        Self::display_header("Load Program Data");
+
+        let mut save_file = File::open(DEFAULT_SAVE_PATH).unwrap();
+        self.shop.load_from_file(&mut save_file);
+
+        println!("Successfully loaded data from {DEFAULT_SAVE_PATH}");
     }
 }

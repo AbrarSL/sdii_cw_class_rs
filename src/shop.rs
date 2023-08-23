@@ -1,4 +1,9 @@
-use std::cmp::Ordering;
+use std::{
+    cmp::Ordering,
+    fmt::Display,
+    fs::File,
+    io::{self, Read, Write},
+};
 
 use crate::{
     customer::Customer,
@@ -21,6 +26,18 @@ pub enum ShopError {
     QueueNotFound,
     StockInsufficient,
     QueueError(FoodQueueError),
+}
+
+impl Display for Shop {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_fmt(format_args!("{}\n{}\n", self.stock(), self.len()))?;
+
+        for queue in self.view_data() {
+            f.write_fmt(format_args!("{}", queue))?;
+        }
+
+        Ok(())
+    }
 }
 
 impl Shop {
@@ -109,5 +126,46 @@ impl Shop {
         sorted_list.sort();
 
         sorted_list
+    }
+
+    pub fn save_to_file(&self, file: &mut File) -> io::Result<usize> {
+        file.write(self.to_string().as_bytes())
+    }
+
+    pub fn load_from_file(&mut self, file: &mut File) {
+        // TODO remove all unwrap calls
+        let mut file_data = String::new();
+        file.read_to_string(&mut file_data).unwrap();
+
+        let mut lines = file_data.lines();
+
+        let new_stock: usize = lines.next().unwrap().parse().unwrap();
+        let no_queues: usize = lines.next().unwrap().parse().unwrap();
+
+        let mut new_queues: Vec<FoodQueue> = Vec::with_capacity(no_queues);
+
+        for _ in 0..no_queues {
+            let queue_id = lines.next().unwrap().parse().unwrap();
+            let queue_capacity = lines.next().unwrap().parse().unwrap();
+            let queue_length = lines.next().unwrap().parse().unwrap();
+
+            let mut new_queue = FoodQueue::new(queue_id, queue_capacity);
+
+            for _ in 0..queue_length {
+                let first_name = lines.next().unwrap();
+                let last_name = lines.next().unwrap();
+                let no_items = lines.next().unwrap().parse().unwrap();
+
+                let customer =
+                    Customer::new(first_name.to_string(), last_name.to_string(), no_items);
+
+                new_queue.add_customer(customer).unwrap();
+            }
+
+            new_queues.push(new_queue);
+        }
+
+        self.queues = new_queues;
+        self.stock = new_stock;
     }
 }

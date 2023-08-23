@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 #[derive(Debug, Clone, Eq, PartialOrd, Ord)]
 pub struct Customer {
     first_name: String,
@@ -12,6 +14,17 @@ impl PartialEq for Customer {
 
     fn ne(&self, other: &Self) -> bool {
         self.full_name() != other.full_name()
+    }
+}
+
+impl Display for Customer {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_fmt(format_args!(
+            "{}\n{}\n{}",
+            self.first_name(),
+            self.last_name(),
+            self.no_items()
+        ))
     }
 }
 

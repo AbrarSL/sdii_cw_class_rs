@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::customer::Customer;
 
 #[derive(Debug, Clone)]
@@ -12,6 +14,23 @@ pub enum FoodQueueError {
     Full,
     Empty,
     CustomerNotFound,
+}
+
+impl Display for FoodQueue {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_fmt(format_args!(
+            "{}\n{}\n{}\n",
+            self.id(),
+            self.capacity(),
+            self.len()
+        ))?;
+
+        for customer in self.queue.as_slice() {
+            f.write_fmt(format_args!("{}\n", customer))?;
+        }
+
+        Ok(())
+    }
 }
 
 impl FoodQueue {
