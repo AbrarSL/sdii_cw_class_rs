@@ -64,8 +64,8 @@ impl TextInterface {
                 "VCS" => self.vcs(),
                 "SPD" => self.spd(),
                 "LPD" => self.lpd(),
-                "STK" => todo!(),
-                "AFS" => todo!(),
+                "STK" => self.stk(),
+                "AFS" => self.afs(),
                 "EXT" => break,
                 _ => println!("Unknown Command!"),
             }
@@ -278,5 +278,29 @@ impl TextInterface {
         self.shop.load_from_file(&mut save_file);
 
         println!("Successfully loaded data from {DEFAULT_SAVE_PATH}");
+    }
+
+    fn stk(&self) {
+        Self::display_header("Current Stock Level");
+
+        println!("Stock: {}", self.shop.stock());
+    }
+
+    fn afs(&mut self) {
+        Self::display_header("Add To Stock");
+
+        let new_stock = match Self::int_input_prompt(
+            "Enter stock amount to add: ",
+            0,
+            (shop::STOCK_MAX_THRESHOLD - self.shop.stock()) as isize,
+        ) {
+            Ok(value) => self.shop.stock() + value as usize,
+            Err(error) => {
+                Self::handle_input_error(error);
+                return;
+            }
+        };
+
+        self.shop.set_stock(new_stock);
     }
 }

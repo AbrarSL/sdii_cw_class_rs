@@ -55,7 +55,7 @@ impl Shop {
         self.stock
     }
 
-    fn set_stock(&mut self, stock: usize) {
+    pub fn set_stock(&mut self, stock: usize) {
         self.stock = stock;
     }
 
