@@ -4,15 +4,19 @@ use std::{
     io::{stdin, stdout, Write},
 };
 
+use adw::prelude::*;
+
 use crate::{
     customer::Customer,
     food_queue::{FoodQueue, FoodQueueError},
+    gui_window::GuiWindow,
     shop::{self, Shop, ShopError},
 };
 
 const DECOR_CHARACTER: &'static str = "*";
 const DECOR_PADDING: usize = 10;
 const DEFAULT_SAVE_PATH: &'static str = "./program_state.txt";
+const APP_ID: &'static str = "com.github.abrarsl.sdii_cw_class_rs";
 
 pub struct TextInterface {
     shop: Shop,
@@ -50,6 +54,8 @@ impl TextInterface {
     }
 
     pub fn run(&mut self) {
+        Self::display_commands();
+
         loop {
             match Self::string_input_prompt("Enter a command: ")
                 .unwrap()
@@ -66,6 +72,8 @@ impl TextInterface {
                 "LPD" => self.lpd(),
                 "STK" => self.stk(),
                 "AFS" => self.afs(),
+                "GUI" => self.gui(),
+                "HHH" => Self::display_commands(),
                 "EXT" => break,
                 _ => println!("Unknown Command!"),
             }
@@ -98,6 +106,26 @@ impl TextInterface {
         } else {
             Ok(number)
         }
+    }
+
+    fn display_commands() {
+        Self::display_header("Commands");
+
+        println!(
+            r"VFQ => View all queues.
+VEQ => View empty queues.
+ACQ => Add customer to queue.
+RCQ => Remove customer from queue.
+PCQ => Server customer from queue.
+VCS => View sorted customers.
+SPD => Save program data.
+LPD => Load program data.
+STK => View stock info.
+AFS => Add items to stock.
+GUI => Launch GUI.
+HHH => Display help.
+EXT => Exit program."
+        );
     }
 
     fn display_header(title: &str) {
@@ -302,5 +330,23 @@ impl TextInterface {
         };
 
         self.shop.set_stock(new_stock);
+    }
+
+    fn gui(&mut self) {
+        // Inefficient as hell
+        Self::display_header("Starting GUI");
+
+        let data = self.shop.clone();
+        let app = adw::Application::builder().application_id(APP_ID).build();
+
+        app.connect_activate(move |app| {
+            let window = GuiWindow::new(data.clone());
+            window.set_application(Some(app));
+            window.set_title(Some("Queue Viewer"));
+
+            window.present();
+        });
+
+        app.run();
     }
 }

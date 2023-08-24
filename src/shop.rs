@@ -14,7 +14,7 @@ pub const STOCK_LOW_THRESHOLD: usize = 10;
 pub const STOCK_MAX_THRESHOLD: usize = 50;
 pub const ITEM_PRICE: usize = 500;
 
-#[derive(Debug, Clone)]
+#[derive(Default, Debug, Clone)]
 pub struct Shop {
     queues: Vec<FoodQueue>,
     stock: usize,
@@ -167,5 +167,14 @@ impl Shop {
 
         self.queues = new_queues;
         self.stock = new_stock;
+    }
+
+    pub fn search_for_customer(&self, query: &str) -> Vec<&Customer> {
+        self.queues
+            .iter()
+            .map(|queue| queue.view_data().iter())
+            .flatten()
+            .filter(|customer| customer.full_name().contains(query))
+            .collect()
     }
 }

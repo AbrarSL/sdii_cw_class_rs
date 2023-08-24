@@ -3,10 +3,10 @@ use text_interface::TextInterface;
 
 mod customer;
 mod food_queue;
+mod gui_window;
 mod shop;
 mod text_interface;
 
 fn main() {
-    let mut text_interface = TextInterface::new(Shop::new(&[2, 3, 5]));
-    text_interface.run();
+    TextInterface::new(Shop::new(&[2, 3, 5])).run();
 }

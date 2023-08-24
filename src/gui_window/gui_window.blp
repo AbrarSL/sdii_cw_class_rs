@@ -1,0 +1,31 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $GuiWindow : ApplicationWindow {
+    Box {
+        margin-top: 12;
+        margin-bottom: 12;
+        margin-start: 12;
+        margin-end: 12;
+        spacing: 12;
+        orientation: vertical;
+
+        Adw.EntryRow {
+            styles ["card"]
+
+            title: "Search";
+            show-apply-button: true;
+            halign: center;
+        }
+
+        Box queue_container {
+            margin-top: 12;
+            margin-bottom: 12;
+            margin-start: 12;
+            margin-end: 12;
+            spacing: 12;
+            halign: center;
+            valign: center;
+        }
+    }
+}
