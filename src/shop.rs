@@ -1,5 +1,4 @@
 use std::{
-    cmp::Ordering,
     fmt::Display,
     fs::File,
     io::{self, Read, Write},
@@ -72,15 +71,8 @@ impl Shop {
             .queues
             .iter_mut()
             .filter(|queue| !queue.is_full())
-            .min_by(|queue1, queue2| {
-                if queue1.len() > queue2.len() {
-                    Ordering::Greater
-                } else if queue1.len() < queue2.len() {
-                    Ordering::Less
-                } else {
-                    Ordering::Equal
-                }
-            }) {
+            .min_by(|queue1, queue2| queue1.len().cmp(&queue2.len()))
+        {
             Some(queue) => Ok(queue.add_customer(customer).unwrap()),
             None => Err(ShopError::Full),
         }

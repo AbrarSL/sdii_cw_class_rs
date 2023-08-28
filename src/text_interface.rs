@@ -1,5 +1,4 @@
 use std::{
-    cmp::Ordering,
     fs::File,
     io::{stdin, stdout, Write},
 };
@@ -35,15 +34,7 @@ impl TextInterface {
         let longest_queue_length = shop
             .view_data()
             .iter()
-            .max_by(|queue1, queue2| {
-                if queue1.capacity() > queue2.capacity() {
-                    Ordering::Greater
-                } else if queue1.capacity() < queue2.capacity() {
-                    Ordering::Less
-                } else {
-                    Ordering::Equal
-                }
-            })
+            .max_by(|queue1, queue2| queue1.capacity().cmp(&queue2.capacity()))
             .unwrap()
             .capacity();
 
@@ -332,7 +323,7 @@ EXT => Exit program."
         self.shop.set_stock(new_stock);
     }
 
-    fn gui(&mut self) {
+    fn gui(&self) {
         // Inefficient as hell
         Self::display_header("Starting GUI");
 
