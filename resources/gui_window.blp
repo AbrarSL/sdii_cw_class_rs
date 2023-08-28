@@ -1,31 +1,36 @@
 using Gtk 4.0;
 using Adw 1;
 
-template $GuiWindow : ApplicationWindow {
+template $GuiWindow : Adw.ApplicationWindow {
     Box {
-        margin-top: 12;
-        margin-bottom: 12;
-        margin-start: 12;
-        margin-end: 12;
-        spacing: 12;
         orientation: vertical;
 
-        Adw.EntryRow {
-            styles ["card"]
-
-            title: "Search";
-            show-apply-button: true;
-            halign: center;
+        HeaderBar {
+            styles ["flat"]
         }
 
-        Box queue_container {
+        Box {
             margin-top: 12;
             margin-bottom: 12;
             margin-start: 12;
             margin-end: 12;
             spacing: 12;
-            halign: center;
-            valign: center;
+            orientation: vertical;
+
+            Entry search_entry {
+                placeholder-text: "Search";
+                secondary-icon-name: "system-search-symbolic";
+            }
+
+            Box queue_container {
+                margin-top: 12;
+                margin-bottom: 12;
+                margin-start: 12;
+                margin-end: 12;
+                spacing: 12;
+                halign: center;
+                valign: center;
+            }
         }
     }
 }

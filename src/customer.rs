@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-#[derive(Debug, Clone, Eq, PartialOrd, Ord)]
+#[derive(Default, Debug, Clone, Eq, PartialOrd, Ord)]
 pub struct Customer {
     first_name: String,
     last_name: String,

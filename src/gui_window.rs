@@ -1,17 +1,18 @@
+use adw::prelude::*;
+use adw::subclass::prelude::*;
 use glib::Object;
 use gtk::gio;
 use gtk::glib;
-use gtk::prelude::*;
-use gtk::subclass::prelude::*;
 
 use std::cell::RefCell;
 
 use crate::customer::Customer;
+use crate::customer_button::CustomerButton;
 use crate::shop::Shop;
 
 glib::wrapper! {
     pub struct GuiWindow(ObjectSubclass<imp::GuiWindow>)
-        @extends gtk::ApplicationWindow, gtk::Window, gtk::Widget,
+        @extends adw::ApplicationWindow, gtk::ApplicationWindow, gtk::Window, gtk::Widget,
         @implements gio::ActionGroup, gio::ActionMap, gtk::Accessible, gtk::Buildable,
                     gtk::ConstraintTarget, gtk::Native, gtk::Root, gtk::ShortcutManager;
 }
@@ -35,7 +36,11 @@ mod imp {
     #[template(file = "resources/gui_window.blp")]
     pub struct GuiWindow {
         #[template_child]
-        queue_container: gtk::TemplateChild<gtk::Box>,
+        pub queue_container: gtk::TemplateChild<gtk::Box>,
+
+        #[template_child]
+        pub search_entry: gtk::TemplateChild<gtk::Entry>,
+
         pub shop: RefCell<Shop>,
     }
 
@@ -43,7 +48,7 @@ mod imp {
     impl ObjectSubclass for GuiWindow {
         const NAME: &'static str = "GuiWindow";
         type Type = super::GuiWindow;
-        type ParentType = gtk::ApplicationWindow;
+        type ParentType = adw::ApplicationWindow;
 
         fn class_init(klass: &mut Self::Class) {
             klass.bind_template();
@@ -76,27 +81,14 @@ mod imp {
                 .build();
 
             for customer in customers {
-                queue_box.append(&Self::construct_customer_button(Some(customer)));
+                queue_box.append(&CustomerButton::new(Some(customer.clone())));
             }
 
             for _ in 0..empty_spaces {
-                queue_box.append(&Self::construct_customer_button(None))
+                queue_box.append(&CustomerButton::new(None));
             }
 
             queue_box
-        }
-
-        fn construct_customer_button(customer: Option<&Customer>) -> gtk::Button {
-            gtk::Button::builder()
-                .label(if customer.is_some() { "O" } else { "X" })
-                .css_classes(if customer.is_some() {
-                    ["suggested-action"]
-                } else {
-                    ["destructive-action"]
-                })
-                .margin_start(6)
-                .margin_end(6)
-                .build()
         }
     }
 
@@ -107,4 +99,6 @@ mod imp {
     impl WindowImpl for GuiWindow {}
 
     impl ApplicationWindowImpl for GuiWindow {}
+
+    impl AdwApplicationWindowImpl for GuiWindow {}
 }
