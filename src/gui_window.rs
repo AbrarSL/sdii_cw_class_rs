@@ -6,8 +6,8 @@ use gtk::glib;
 
 use std::cell::RefCell;
 
-use crate::customer::Customer;
 use crate::customer_button::CustomerButton;
+use crate::queue_box::QueueBox;
 use crate::shop::Shop;
 
 glib::wrapper! {
@@ -64,31 +64,9 @@ mod imp {
             let shop = self.shop.borrow();
 
             for queue in shop.view_data() {
-                let empty_spaces = queue.capacity() - queue.len();
-                let queue_box = Self::construct_queue_box(queue.view_data(), empty_spaces);
+                let queue_box = QueueBox::new(queue);
                 self.queue_container.append(&queue_box);
             }
-        }
-
-        fn construct_queue_box(customers: &[Customer], empty_spaces: usize) -> gtk::Box {
-            let queue_box = gtk::Box::builder()
-                .margin_top(12)
-                .margin_bottom(12)
-                .margin_start(12)
-                .margin_end(12)
-                .spacing(6)
-                .orientation(gtk::Orientation::Vertical)
-                .build();
-
-            for customer in customers {
-                queue_box.append(&CustomerButton::new(Some(customer.clone())));
-            }
-
-            for _ in 0..empty_spaces {
-                queue_box.append(&CustomerButton::new(None));
-            }
-
-            queue_box
         }
     }
 

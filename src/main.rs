@@ -5,6 +5,7 @@ mod customer;
 mod customer_button;
 mod food_queue;
 mod gui_window;
+mod queue_box;
 mod shop;
 mod text_interface;
 
