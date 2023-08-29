@@ -28,7 +28,7 @@ impl CustomerButton {
         button.set_margin_end(6);
 
         if let Some(customer) = customer {
-            imp.customer.borrow_mut().replace(customer);
+            imp.customer.replace(Some(customer));
         }
 
         button

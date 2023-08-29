@@ -14,14 +14,6 @@ glib::wrapper! {
 impl QueueBox {
     pub fn new(queue: &FoodQueue) -> Self {
         let queue_box: QueueBox = glib::Object::builder().build();
-
-        queue_box.set_margin_top(12);
-        queue_box.set_margin_bottom(12);
-        queue_box.set_margin_start(12);
-        queue_box.set_margin_end(12);
-        queue_box.set_spacing(6);
-        queue_box.set_orientation(gtk::Orientation::Vertical);
-
         let empty_spaces = queue.capacity() - queue.len();
 
         for customer in queue.view_data() {
@@ -39,7 +31,8 @@ impl QueueBox {
 mod imp {
     use super::*;
 
-    #[derive(Default, Debug)]
+    #[derive(Default, Debug, gtk::CompositeTemplate)]
+    #[template(file = "resources/queue_box.blp")]
     pub struct QueueBox;
 
     #[glib::object_subclass]
@@ -47,6 +40,14 @@ mod imp {
         const NAME: &'static str = "QueueBox";
         type Type = super::QueueBox;
         type ParentType = gtk::Box;
+
+        fn class_init(klass: &mut Self::Class) {
+            klass.bind_template();
+        }
+
+        fn instance_init(obj: &glib::subclass::InitializingObject<Self>) {
+            obj.init_template();
+        }
     }
 
     impl ObjectImpl for QueueBox {}

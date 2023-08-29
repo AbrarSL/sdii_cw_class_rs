@@ -6,7 +6,6 @@ use gtk::glib;
 
 use std::cell::RefCell;
 
-use crate::customer_button::CustomerButton;
 use crate::queue_box::QueueBox;
 use crate::shop::Shop;
 
